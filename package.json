@@ -3,6 +3,9 @@
   "version": "1.0.2",
   "description": "smartMCC cli",
   "main": "index.js",
+  "bin": {
+    "mcc-cli": "./bin/mcc-cli.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
