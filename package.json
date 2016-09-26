@@ -12,7 +12,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.5.5",
     "commander": "^2.9.0",
+    "expect.js": "^0.3.1",
+    "file": "^0.2.2",
     "mkdirp": "^0.5.1"
+  },
+  "devDependencies": {
+    "mocha": "^3.0.2",
+    "mock-fs": "^3.11.0",
+    "rimraf": "^2.5.4"
   }
 }
