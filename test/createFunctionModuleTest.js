@@ -19,7 +19,8 @@ const fileSystem = {
             'b': {
 
             }
-        }
+        },
+        "settings.gradle": new Buffer("include ':app', ':mobile-cloud-computing-library'")
     },
 };
 
@@ -33,24 +34,25 @@ describe("createFunctionModuleAction", () => {
     before(() => {
         createTempDirectory();
         process.chdir("root/a/b")
-        createFunctionModuleAction(testModuleName);
+        createFunctionModuleAction.action(testModuleName);
     });
 
     it("should create directory in the root path", () => {
         var structure = directoryStructureToObject(join(process.cwd(), "../.."));
-        // expect(structure[`${testModuleName.toLowerCase()}${config.moduleSuffix}`]).to.be.ok();
+        expect(structure[`${testModuleName}${config.moduleSuffix}`]).to.be.ok();
     })
 
-    it("should create Lambda handler directory in the root path", () => {
+    it("should create Lambda handler directory in the function module path", () => {
         var structure = directoryStructureToObject(join(process.cwd(), "../.."));
-        let handlerDir = `${testModuleName.toLowerCase()}${config.handlerSuffix}`;
-        expect(structure[handlerDir]).to.be.ok();
+        let handlerDir = `${config.functionHandlerDir}`;
+        let moduleName = `${testModuleName}${config.moduleSuffix}`;
+        expect(structure[moduleName][handlerDir]).to.be.ok();
     })
 
-    it("should create Lambda handler in the root path", () => {
+    it("should create Lambda handler as a subproject", () => {
         var structure = directoryStructureToObject(join(process.cwd(), "../.."));
-        let handlerDirPath = `${testModuleName.toLowerCase()}${config.handlerSuffix}`;
-        let handlerDir = structure[handlerDirPath].src.main.java;
+        let handlerDirPath = `${testModuleName}${config.handlerSuffix}`;
+        let handlerDir = structure[`${testModuleName}${config.moduleSuffix}`][config.functionHandlerDir].src.main.java;
         let packageDir = handlerDir;
         config.handlerPackageName.split(".").forEach((relDir) => {
           packageDir = packageDir[relDir];

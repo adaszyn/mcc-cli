@@ -39,7 +39,7 @@ describe("ListFunctions action", () => {
     it("Should list all functions in current dir", () => {
         const functionNames = getAllFunctions();
         testModuleNames.map((testModuleName) =>
-            expect(functionNames.includes(testModuleName + config.moduleSuffix)).to.equal(true)
+            expect(functionNames.includes(testModuleName)).to.equal(true)
         )
 
     })

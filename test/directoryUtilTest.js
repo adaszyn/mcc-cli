@@ -1,9 +1,9 @@
-var should = require('expect.js');
 var join = require('path').join;
-var expect = require('expect.js');
 var fs = require('fs');
 var path = require('path');
 var mock = require('mock-fs');
+var expect = require('chai').expect;
+
 var directoryUtil = require('../lib/util/directoryUtil');
 require('mocha');
 
@@ -27,12 +27,15 @@ function createTempDirectory() {
 }
 
 describe("directoryUtil.directoryStructureToObject", () => {
+    let startPath;
     before(() => {
+        startPath = process.cwd();
         createTempDirectory();
     });
+    beforeEach(() => { process.chdir(startPath) })
     it("create object from file dir structure", () => {
-        var directoryStructure = directoryUtil.directoryStructureToObject('');
-        expect(mockFileSystem).to.eql(directoryStructure);
+        var directoryStructure = directoryUtil.directoryStructureToObject("");
+        expect(mockFileSystem).to.deep.eql(directoryStructure);
     });
     after(() => {
         mock.restore();
@@ -50,13 +53,13 @@ describe("directoryUil", () => {
     })
 
     it(".getMccConfigObject() should return parsed config file", () => {
-        expect(directoryUtil.getMccConfigObject()).to.be.ok();
+        expect(directoryUtil.getMccConfigObject()).be.a('object');
     });
 
     it("Should determine if cwd is a child of smart-mcc project", () => {
         expect(
             directoryUtil.isValidMccProjectPath(process.cwd())
-        ).to.be(true);
+        ).be.true;
     });
 
     after(() => {

@@ -9,7 +9,10 @@ MCC-cli is a part of SmartMCC framework built for Bachelor thesis.
 ```
 npm install -g mcc-cli
 ```
-<!-- ## Usage -->
+## Usage
+
+After successful installation *mcc-cli* tool will be available in your console.
+In order to manage your functions change directory to project's main folder. 
 
 <!-- TODO: expand this section -->
 
@@ -17,6 +20,8 @@ npm install -g mcc-cli
 
 Szymon Wojtkowski
 Wojciech Adaszyński
+
+
 
 ## License
 
