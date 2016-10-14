@@ -5,32 +5,30 @@ var path = require('path');
 var mock = require('mock-fs');
 var directoryUtil = require('../lib/util/directoryUtil');
 var gradleUtil = require('../lib/util/gradleUtil');
+const CONFIG = require("../lib/config");
 require('mocha');
 
 var SMART_MCC_FILENAME = require("../lib/config").smartmccFileName;
 
-const mockFileSystem = {
-    'path': {
-        'to': {
-            'fake': {
-                'dir': {}
-            },
-            ".smartmcc": new Buffer(JSON.stringify({
-                defaultRoleId: "defaultRoleId123:ndjasndla2k13nwk1l"
-            }, null, 2)),
-            "settings.gradle": new Buffer("include ':app', ':mobile-cloud-computing-library'")
-        }
+const getBaseMockFileSystem = () => ({
+    'root': {
+        ".smartmcc": new Buffer(JSON.stringify({
+            defaultRoleId: "defaultRoleId123:ndjasndla2k13nwk1l"
+        }, null, 2)),
+        "settings.gradle": new Buffer("include ':app', ':mobile-cloud-computing-library'")
     }
-};
+});
 
 function createTempDirectory(schemaObject) {
     mock(schemaObject);
 }
 
 describe("gradleUtil", () => {
-    const startPath = join(process.cwd(), "path/to");
+    let mockFileSystem = null;
+    const startPath = join(process.cwd(), "root");
 
     beforeEach(() => {
+      mockFileSystem = getBaseMockFileSystem();
       createTempDirectory(mockFileSystem);
       process.chdir(startPath)
     })
@@ -59,13 +57,35 @@ describe("gradleUtil", () => {
     }),
 
     it(".moduleArrayToIncludeStatement should throw error on settings missing", () => {
-        const wrongFileSystem = Object.assign({}, mockFileSystem);
-        delete wrongFileSystem.path.to['settings.gradle'];
+        const wrongFileSystem = getBaseMockFileSystem();
+        delete wrongFileSystem.root['settings.gradle'];
         createTempDirectory(wrongFileSystem);
         expect(gradleUtil.appendModuleToMainProject.bind(null, "LOREM IPSUM")).to.throw(Error);
     });
 
+    it(".extractIncludeStatementsFromString should return single return aray", () => {
+        let includeStatement = `include :'hello', :'world'`;
+        let testSettingsGradleContent = `Lorem ipsum\n${includeStatement}\nfoo foo bar\n`;
+        const statement = gradleUtil.extractIncludeStatementsFromString(testSettingsGradleContent)
+        expect(statement).to.be.a("string");
+        expect(testSettingsGradleContent.indexOf(includeStatement)).to.be.above(-1);
 
+    });
+
+    it(".getMainSettingsContent should return settings.gradle file content", () => {
+        const content = gradleUtil.getMainSettingsContent();
+        expect(content).to.eql(mockFileSystem.root["settings.gradle"]);
+    });
+
+    it(".removeModuleToMainProject should should remove elem from settings.gradle", () => {
+        let modulesSettings = mockFileSystem.root[`${CONFIG.settingsGradleFileName}`].toString();
+        const newModule = 'FooBar';
+        const newModulesSettings = modulesSettings + `, ':${newModule}_smarttask', ':${newModule}_smarttask:handler'`;
+        mockFileSystem.root[`${CONFIG.settingsGradleFileName}`] = newModulesSettings;
+        gradleUtil.removeModuleToMainProject(newModule);
+        const content = gradleUtil.getMainSettingsContent().toString();
+        expect(content).to.eql(modulesSettings);
+    });
 
     afterEach(() => {
         mock.restore();
